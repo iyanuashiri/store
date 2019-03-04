@@ -2,7 +2,10 @@ from pathlib import Path
 import json
 
 from terminaltables import SingleTable
+from googleapiclient.http import MediaFileUpload
 import click
+
+from .utils import authorize_google_drive
 
 
 folder = Path().home() / 'source_data'
@@ -53,3 +56,26 @@ def search(query):
 
         table = SingleTable(results)
         click.echo(table.table)
+
+
+@main.command('push', short_help='Push the file to your Google drive')
+@click.option('--first_time', default=False, help='Set to True if this is the first time you are using push command')
+def push(first_time=False):
+    service = authorize_google_drive()
+    file_metadata = {'name': 'commands.json'}
+    commands_file = MediaFileUpload('{0}'.format(directory), resumable=True)
+
+    if not first_time:
+        file = service.files().create(body=file_metadata, media_body=commands_file, fields='id').execute()
+        push_id = file.get('id')
+        with open(id_directory, 'w') as f:
+            f.write(push_id)
+
+    else:
+        with open(id_directory) as f:
+            push_id = f.read()
+        file = service.files().update(fileId=push_id, media_body=commands_file, fields='id',
+                                      body=file_metadata).execute()
+        push_id = file.get('id')
+
+    click.echo('Push is complete. Your push_id is {}'.format(push_id))

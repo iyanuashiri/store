@@ -107,3 +107,6 @@ def list_all():
         table = SingleTable(results)
         click.echo(table.table)
 
+
+if __name__ == '__main__':
+    main()

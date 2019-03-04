@@ -80,6 +80,7 @@ def push(first_time=False):
         push_id = file.get('id')
 
     click.echo('Push is complete. Your push_id is {}'.format(push_id))
+    click.echo('Write down your push_id in a safe place')
 
 
 @main.command('pull', short_help='Pull the file from Google drive')
@@ -93,6 +94,7 @@ def pull(push_id):
     while done is False:
         status, done = downloader.next_chunk()
         click.echo("Download {}.".format(int(status.progress() * 100)))
+    click.echo("Download complete")
 
 
 @main.command('list', short_help='List all saved commands')

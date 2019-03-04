@@ -27,3 +27,14 @@ def init():
         commands = dict()
         json.dump(commands, f)
     click.echo('File has been initialized')
+
+
+@main.command('save', short_help='Save a command')
+@click.argument('description', help='Description of the command')
+@click.argument('command', help='The command that needs to be saved')
+def save(description, command):
+    with open(directory, 'w') as f:
+        commands = json.load(f)
+        commands[description] = command
+        json.dump(commands, f)
+    click.echo('Command has been saved')

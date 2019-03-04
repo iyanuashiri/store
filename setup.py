@@ -18,7 +18,7 @@ URL = 'https://github.com/iyanuashiri/store'
 EMAIL = 'ajaoiyanu@gmail.com'
 AUTHOR = 'Iyanu Ajao'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = None
+VERSION = '0.0.1'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

@@ -1,8 +1,9 @@
 from pathlib import Path
 import json
+import io
 
 from terminaltables import SingleTable
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import click
 
 from .utils import authorize_google_drive
@@ -79,3 +80,16 @@ def push(first_time=False):
         push_id = file.get('id')
 
     click.echo('Push is complete. Your push_id is {}'.format(push_id))
+
+
+@main.command('pull', short_help='Pull the file from Google drive')
+@click.argument('push_id', help='Use your upload_id as a commandline argument')
+def pull(push_id):
+    service = authorize_google_drive()
+    request = service.files().get_media(fileId=push_id)
+    fh = io.BytesIO()
+    downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while done is False:
+        status, done = downloader.next_chunk()
+        click.echo("Download {}.".format(int(status.progress() * 100)))

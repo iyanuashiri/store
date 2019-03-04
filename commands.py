@@ -38,3 +38,18 @@ def save(description, command):
         commands[description] = command
         json.dump(commands, f)
     click.echo('Command has been saved')
+
+
+@main.command('search', short_help='Search for a command')
+@click.argument('query', help='What do you want to search for?')
+def search(query):
+    with open(directory) as f:
+        commands = json.load(f)
+        results = list()
+        results.append(['description', 'command'])
+        for k, v in commands.items():
+            if query in k or query in v:
+                results.append([k, v])
+
+        table = SingleTable(results)
+        click.echo(table.table)

@@ -93,3 +93,17 @@ def pull(push_id):
     while done is False:
         status, done = downloader.next_chunk()
         click.echo("Download {}.".format(int(status.progress() * 100)))
+
+
+@main.command('list', short_help='List all saved commands')
+def list_all():
+    with open(directory) as f:
+        commands = json.load(f)
+        results = list()
+        results.append(['description', 'command'])
+        for k, v in commands.items():
+            results.append([k, v])
+
+        table = SingleTable(results)
+        click.echo(table.table)
+

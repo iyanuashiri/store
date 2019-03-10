@@ -1,13 +1,16 @@
-from pathlib import Path
-import json
 import io
+import json
+from pathlib import Path
 
-from terminaltables import SingleTable
-from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 import click
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
+from googleapiclient.discovery import build
+from httplib2 import Http
+from oauth2client import file as f, tools, client
+from terminaltables import SingleTable
 
-from .utils import authorize_google_drive
 
+SCOPES = 'https://www.googleapis.com/auth/drive.file'
 
 folder = Path().home() / 'source_data'
 
@@ -20,6 +23,17 @@ directory.touch()
 id_directory = folder / 'file.txt'
 
 
+def authorize_google_drive():
+    store = f.Storage('token.json')
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets('credentials.json', SCOPES)
+        creds = tools.run_flow(flow, store)
+
+    service = build('drive', 'v3', http=creds.authorize(Http()))
+    return service
+
+
 @click.group()
 def main():
     pass
@@ -27,9 +41,9 @@ def main():
 
 @main.command('init', short_help='Initialize the file')
 def init():
-    with open(directory, 'w') as f:
+    with open(directory, 'w') as file:
         commands = dict()
-        json.dump(commands, f)
+        json.dump(commands, file)
     click.echo('File has been initialized')
 
 
@@ -37,18 +51,18 @@ def init():
 @click.argument('description', help='Description of the command')
 @click.argument('command', help='The command that needs to be saved')
 def save(description, command):
-    with open(directory, 'w') as f:
-        commands = json.load(f)
+    with open(directory, 'w') as file:
+        commands = json.load(file)
         commands[description] = command
-        json.dump(commands, f)
+        json.dump(commands, file)
     click.echo('Command has been saved')
 
 
 @main.command('search', short_help='Search for a command')
 @click.argument('query', help='What do you want to search for?')
 def search(query):
-    with open(directory) as f:
-        commands = json.load(f)
+    with open(directory) as file:
+        commands = json.load(file)
         results = list()
         results.append(['description', 'command'])
         for k, v in commands.items():
@@ -67,17 +81,17 @@ def push(first_time=False):
     commands_file = MediaFileUpload('{0}'.format(directory), resumable=True)
 
     if not first_time:
-        file = service.files().create(body=file_metadata, media_body=commands_file, fields='id').execute()
-        push_id = file.get('id')
-        with open(id_directory, 'w') as f:
-            f.write(push_id)
+        file_ = service.files().create(body=file_metadata, media_body=commands_file, fields='id').execute()
+        push_id = file_.get('id')
+        with open(id_directory, 'w') as file:
+            file.write(push_id)
 
     else:
-        with open(id_directory) as f:
-            push_id = f.read()
-        file = service.files().update(fileId=push_id, media_body=commands_file, fields='id',
-                                      body=file_metadata).execute()
-        push_id = file.get('id')
+        with open(id_directory) as file:
+            push_id = file.read()
+        file_ = service.files().update(fileId=push_id, media_body=commands_file, fields='id',
+                                       body=file_metadata).execute()
+        push_id = file_.get('id')
 
     click.echo('Push is complete. Your push_id is {}'.format(push_id))
     click.echo('Write down your push_id in a safe place')
@@ -99,8 +113,8 @@ def pull(push_id):
 
 @main.command('list', short_help='List all saved commands')
 def list_all():
-    with open(directory) as f:
-        commands = json.load(f)
+    with open(directory) as file:
+        commands = json.load(file)
         results = list()
         results.append(['description', 'command'])
         for k, v in commands.items():

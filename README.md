@@ -75,6 +75,26 @@ $ store show
 This displays the push id. You receive a push id after using the `push` command.
 
 
+## Development Purposes
+
+* For Development
+    * clone the repo
+    ```commandline
+        $ git clone https://github.com/iyanuashiri/store.git
+    ```
+    * get your `client_secret.json` from [Oauth](https://console.cloud.google.com/apis/credentials/oauthclient). Make sure to enable [Drive Api](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=Drive) for the project.
+    * rename the client secret to `credentials.json` and place it in the same directory as setup.py.
+    * install the package:
+    ```sh
+        # move into setup.py directory
+        $ cd 
+        # install package in edit mode
+        $ pip install -e . #note the dot
+    ```
+
+
+
+
 ## How to Contribute
 
 Click here to read the [contributing](https://github.com/iyanuashiri/store/blob/master/CONTRIBUTING.md) guide.

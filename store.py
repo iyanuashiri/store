@@ -43,23 +43,26 @@ def main():
 def init():
     with open(directory, 'w') as file:
         commands = dict()
+        commands['description'] = 'command'
         json.dump(commands, file)
     click.echo('File has been initialized')
 
 
 @main.command('save', short_help='Save a command')
-@click.argument('description', help='Description of the command')
-@click.argument('command', help='The command that needs to be saved')
+@click.option('-d', '--description', help='Description of the command')
+@click.option('-c', '--command', help='The command that needs to be saved')
 def save(description, command):
-    with open(directory, 'w') as file:
+    with open(directory, 'r') as file:
         commands = json.load(file)
         commands[description] = command
+
+    with open(directory, 'w') as file:
         json.dump(commands, file)
     click.echo('Command has been saved')
 
 
 @main.command('search', short_help='Search for a command')
-@click.argument('query', help='What do you want to search for?')
+@click.option('-q', '--query', help='What do you want to search for?')
 def search(query):
     with open(directory) as file:
         commands = json.load(file)
@@ -94,11 +97,11 @@ def push(first_time=False):
         push_id = file_.get('id')
 
     click.echo('Push is complete. Your push_id is {}'.format(push_id))
-    click.echo('Write down your push_id in a safe place')
+    click.echo('Write down your push id in a safe place')
 
 
 @main.command('pull', short_help='Pull the file from Google drive')
-@click.argument('push_id', help='Use your upload_id as a commandline argument')
+@click.option('-p', '--push_id', help='Use your upload_id as a commandline argument')
 def pull(push_id):
     service = authorize_google_drive()
     request = service.files().get_media(fileId=push_id)

@@ -41,11 +41,14 @@ def main():
 
 @main.command('init', short_help='Initialize the file')
 def init():
-    with open(directory, 'w') as file:
-        commands = dict()
-        commands['description'] = 'command'
-        json.dump(commands, file)
-    click.echo('File has been initialized')
+    if directory.exists():
+        click.echo('File has already been initialized')
+    else:
+        with open(directory, 'w') as file:
+            commands = dict()
+            commands['description'] = 'command'
+            json.dump(commands, file)
+        click.echo('File has been initialized')
 
 
 @main.command('save', short_help='Save a command')

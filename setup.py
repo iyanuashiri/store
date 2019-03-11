@@ -12,8 +12,8 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'store'
-DESCRIPTION = 'A Tool to save commands used in Terminal and create a backup on Google drive'
+NAME = 'store-cli'
+DESCRIPTION = 'A Tool to save commands used in terminal and create a backup on Google drive'
 URL = 'https://github.com/iyanuashiri/store'
 EMAIL = 'ajaoiyanu@gmail.com'
 AUTHOR = 'Iyanu Ajao'
@@ -22,7 +22,7 @@ VERSION = '1.0.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'click', 'google-api-python-client', 'terminaltables',
+    'click', 'google-api-python-client', 'terminaltables', 'oauth2client',
 ]
 
 # What packages are optional?
@@ -106,9 +106,9 @@ setup(
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    entry_points={
+         'console_scripts': ['store=store:main'],
+     },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,

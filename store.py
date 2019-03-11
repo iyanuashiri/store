@@ -82,13 +82,13 @@ def search(query):
 
 
 @main.command('push', short_help='Push the file to your Google drive')
-@click.option('--first_time', default=False, help='Set to True if this is the first time you are using push command')
-def push(first_time=False):
+@click.option('f', '--first', is_flag=True, help='Use this option if this is the first time you are using push command')
+def push(first=False):
     service = authorize_google_drive()
     file_metadata = {'name': 'commands.json'}
     commands_file = MediaFileUpload('{0}'.format(directory), resumable=True)
 
-    if not first_time:
+    if first:
         file_ = service.files().create(body=file_metadata, media_body=commands_file, fields='id').execute()
         push_id = file_.get('id')
         with open(id_directory, 'w') as file:

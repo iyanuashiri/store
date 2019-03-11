@@ -22,6 +22,8 @@ directory.touch()
 
 id_directory = folder / 'file.txt'
 
+id_directory.touch()
+
 
 def authorize_google_drive():
     store = f.Storage('token.json')
@@ -128,6 +130,13 @@ def list_all():
 
         table = SingleTable(results)
         click.echo(table.table)
+
+
+@main.command('show', short_help='Print the push_id')
+def show():
+    with open(id_directory) as file:
+        click.echo('Your push id is:')
+        click.echo(file.read())
 
 
 if __name__ == '__main__':
